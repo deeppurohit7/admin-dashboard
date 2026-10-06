@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ApexMetrics Cloud Command Center - Real-Time Enterprise Infrastructure & Analytics">
+  <title>ApexMetrics | Cloud Command Center</title>
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="dashboard-wrapper d-flex">
+    
+    <!-- Sidebar (Desktop Fixed / Mobile Offcanvas) -->
+    <aside class="sidebar-chassis offcanvas-lg offcanvas-start" tabindex="-1" id="sidebarNav">
+      <div class="sidebar-brand border-bottom border-secondary-subtle p-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <span class="brand-logo">AM</span>
+          <span class="brand-name">Apex<span>Metrics</span></span>
+        </div>
+        <button type="button" class="btn-close btn-close-white d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebarNav" aria-label="Close"></button>
+      </div>
+
+      <div class="sidebar-body p-3">
+        <span class="nav-section-title">CONTROL TOWER</span>
+        <ul class="nav flex-column gap-1 mb-4" id="dashboard-tabs" role="tablist">
+          <li class="nav-item">
+            <button class="nav-link active" id="tab-overview-btn" data-bs-toggle="tab" data-bs-target="#tab-overview" type="button" role="tab">
+              <span class="nav-ico">📊</span> Overview Console
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="tab-nodes-btn" data-bs-toggle="tab" data-bs-target="#tab-nodes" type="button" role="tab">
+              <span class="nav-ico">☁️</span> Cloud Nodes <span class="badge bg-cyan text-dark ms-auto">4 Live</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="tab-logs-btn" data-bs-toggle="tab" data-bs-target="#tab-logs" type="button" role="tab">
+              <span class="nav-ico">💻</span> Live Terminal Stream
+            </button>
+          </li>
+        </ul>
+
+        <span class="nav-section-title">MANAGEMENT</span>
+        <ul class="nav flex-column gap-1">
+          <li class="nav-item">
+            <a class="nav-link" href="#billing-section"><span class="nav-ico">💳</span> Invoices & MRR</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#transaction-section"><span class="nav-ico">📑</span> Ledger Audit</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-user border-top border-secondary-subtle p-3 mt-auto">
+        <div class="d-flex align-items-center gap-2">
+          <div class="user-avatar">DP</div>
+          <div class="user-info">
+            <span class="user-display">Deep Purohit</span>
+            <span class="user-tier">Root Administrator</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <div class="main-canvas flex-grow-1">
+      
+      <!-- Top Action Bar -->
+      <header class="top-nav px-4 py-3 border-bottom border-secondary-subtle d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarNav">
+            ☰
+          </button>
+          
+          <!-- Live Telemetry Pulse -->
+          <div class="live-stream-badge">
+            <span class="beacon-pulse"></span>
+            <span id="live-pulse-text">LIVE STREAM • AP-SOUTH-1 (MUMBAI)</span>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <!-- Notification Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-tool position-relative" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              🔔 Notifications
+              <span class="badge-dot" id="notif-dot"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark p-2" aria-labelledby="notifDropdown" style="width: 320px;">
+              <li class="dropdown-header d-flex justify-content-between text-dim small">
+                <span>SYSTEM NOTIFICATIONS</span>
+                <a href="#" id="clear-notif" class="text-cyan text-decoration-none">Clear</a>
+              </li>
+              <li><hr class="dropdown-divider border-secondary"></li>
+              <li class="p-2 small" id="notif-item-1">
+                <strong class="text-success d-block">✓ Auto-scaling Completed</strong>
+                <span class="text-dim">Added 2 nodes in Mumbai cluster (ap-south-1) due to traffic load.</span>
+              </li>
+              <li class="p-2 small" id="notif-item-2">
+                <strong class="text-cyan d-block">ℹ️ Invoice #8041 Paid</strong>
+                <span class="text-dim">₹1,48,500 successfully deposited via Razorpay.</span>
+              </li>
+            </ul>
+          </div>
+
+          <button class="btn btn-cyan btn-sm fw-bold px-3" data-bs-toggle="modal" data-bs-target="#deployModal">
+            + Deploy Cluster
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB CONTENTS -->
+      <div class="tab-content p-4" id="dashboardTabContent">
+        
+        <!-- TAB 1: OVERVIEW CONSOLE -->
+        <div class="tab-pane fade show active" id="tab-overview" role="tabpanel">
+          
+          <!-- KPI Metrics Row -->
+          <div class="row g-3 mb-4">
+            <div class="col-xl-3 col-sm-6">
+              <div class="kpi-box p-3">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="kpi-title">TOTAL REVENUE (MRR)</span>
+                  <span class="delta-badge up">+18.4%</span>
+                </div>
+                <div class="kpi-number" id="kpi-revenue">₹14.28M</div>
+                <span class="kpi-caption">Target: ₹15.0M by end of Q4</span>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-sm-6">
+              <div class="kpi-box p-3">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="kpi-title">LIVE API THROUGHPUT</span>
+                  <span class="delta-badge up" id="kpi-req-delta">+12.1%</span>
+                </div>
+                <div class="kpi-number" id="kpi-throughput">84,210 <small>req/s</small></div>
+                <span class="kpi-caption">Peak: 112k req/s at 14:00 IST</span>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-sm-6">
+              <div class="kpi-box p-3">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="kpi-title">AVG SERVER LATENCY</span>
+                  <span class="delta-badge neutral" id="kpi-latency-delta">OPTIMAL</span>
+                </div>
+                <div class="kpi-number text-cyan" id="kpi-latency">24 ms</div>
+                <span class="kpi-caption">Global edge network benchmark</span>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-sm-6">
+              <div class="kpi-box p-3">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="kpi-title">CONTAINER CLUSTERS</span>
+                  <span class="delta-badge up">99.98%</span>
+                </div>
+                <div class="kpi-number" id="kpi-nodes">1,428</div>
+                <span class="kpi-caption">Operational across 4 regions</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="row g-4 mb-4">
+            <!-- Main Interactive Analytics Area Chart -->
+            <div class="col-lg-8">
+              <div class="panel-box p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                  <div>
+                    <h3 class="panel-title">Telemetry Stream & Velocity</h3>
+                    <p class="panel-subtitle">Interactive comparison against previous benchmark cycles.</p>
+                  </div>
+
+                  <!-- Metric Switcher -->
+                  <div class="d-flex gap-2 align-items-center">
+                    <select id="metric-select" class="form-select form-select-sm metric-dropdown">
+                      <option value="revenue" selected>Metric: Revenue (₹)</option>
+                      <option value="throughput">Metric: API Throughput (req/s)</option>
+                      <option value="latency">Metric: Latency (ms)</option>
+                    </select>
+
+                    <div class="btn-group btn-group-sm range-group" role="group">
+                      <button type="button" class="btn btn-range" data-range="7D">7D</button>
+                      <button type="button" class="btn btn-range active" data-range="30D">30D</button>
+                      <button type="button" class="btn btn-range" data-range="90D">90D</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="chart-canvas-box" style="position: relative; height: 320px;">
+                  <canvas id="velocityChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ingestion Traffic Doughnut Chart -->
+            <div class="col-lg-4">
+              <div class="panel-box p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <h3 class="panel-title">Protocol Distribution</h3>
+                  <p class="panel-subtitle">Traffic split across client ingress nodes.</p>
+                </div>
+
+                <div class="chart-canvas-box my-auto" style="position: relative; height: 210px;">
+                  <canvas id="trafficChart"></canvas>
+                </div>
+
+                <div class="protocol-legend mt-3 pt-3 border-top border-secondary-subtle">
+                  <div class="d-flex justify-content-between small text-dim mb-1">
+                    <span>🌐 Web App Clients</span>
+                    <strong class="text-white">45%</strong>
+                  </div>
+                  <div class="d-flex justify-content-between small text-dim mb-1">
+                    <span>⚡ REST & GraphQL APIs</span>
+                    <strong class="text-white">35%</strong>
+                  </div>
+                  <div class="d-flex justify-content-between small text-dim">
+                    <span>📱 Mobile & IoT SDKs</span>
+                    <strong class="text-white">20%</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transaction & Ledger Table Section -->
+          <section id="transaction-section" class="panel-box p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+              <div>
+                <h3 class="panel-title">Enterprise Ledger & Cluster Provisions</h3>
+                <p class="panel-subtitle">Filter by status, search by client, or download full CSV report.</p>
+              </div>
+
+              <div class="d-flex gap-2 flex-wrap">
+                <input type="text" id="search-input" class="form-control form-control-sm search-field" placeholder="Search customer or ID...">
+                <button class="btn btn-export btn-sm" id="btn-export-csv">📥 Export CSV</button>
+              </div>
+            </div>
+
+            <!-- Status Filter Badges -->
+            <div class="status-filter-pills mb-3 d-flex gap-2">
+              <button class="filter-pill active" data-status="ALL">All (<span id="count-all">7</span>)</button>
+              <button class="filter-pill" data-status="Completed">Completed (<span id="count-completed">4</span>)</button>
+              <button class="filter-pill" data-status="Processing">Processing (<span id="count-processing">2</span>)</button>
+              <button class="filter-pill" data-status="Failed">Failed (<span id="count-failed">1</span>)</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-dark table-hover align-middle data-table">
+                <thead>
+                  <tr>
+                    <th>TRANSACTION ID</th>
+                    <th>ORGANIZATION</th>
+                    <th>REGION</th>
+                    <th class="cursor-pointer" id="th-amount" title="Click to sort by amount">AMOUNT (INR) ⇕</th>
+                    <th>STATUS</th>
+                    <th>TIMESTAMP</th>
+                    <th>ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody id="table-rows">
+                  <!-- Populated dynamically via app.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Pagination Controls -->
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary-subtle">
+              <span class="text-dim small" id="pagination-summary">Showing 1 to 5 of 7 entries</span>
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-secondary" id="page-prev-btn">Previous</button>
+                <button class="btn btn-outline-secondary" id="page-next-btn">Next</button>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- TAB 2: REGIONAL CLOUD NODES -->
+        <div class="tab-pane fade" id="tab-nodes" role="tabpanel">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="panel-title">Regional Cloud Clusters</h3>
+              <p class="panel-subtitle">Real-time health, CPU, memory, and container status across global zones.</p>
+            </div>
+            <button class="btn btn-outline-cyan btn-sm" onclick="alert('Diagnostics triggered for all 4 clusters!')">Run Diagnostic Ping ⚡</button>
+          </div>
+
+          <div class="row g-4" id="nodes-grid">
+            <!-- Populated via app.js -->
+          </div>
+        </div>
+
+        <!-- TAB 3: LIVE TERMINAL LOG STREAM -->
+        <div class="tab-pane fade" id="tab-logs" role="tabpanel">
+          <div class="panel-box p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h3 class="panel-title">Cluster System Logs (Live Stream)</h3>
+                <p class="panel-subtitle">Stdout stream from container orchestrator and API gateways.</p>
+              </div>
+              <button class="btn btn-tool btn-sm" id="btn-clear-logs">Clear Console</button>
+            </div>
+
+            <div class="terminal-chassis" id="terminal-console">
+              <!-- Streaming log items injected dynamically via app.js -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Deploy Service Modal -->
+  <div class="modal fade" id="deployModal" tabindex="-1" aria-labelledby="deployModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-bg-dark border-secondary">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="deployModalLabel">Deploy Microservice Node</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="deploy-cluster-form">
+            <div class="mb-3">
+              <label class="form-label small text-dim">Cluster Name</label>
+              <input type="text" id="deploy-name" class="form-control bg-surface text-white border-secondary" placeholder="e.g. auth-vault-v2" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-dim">Deployment Region</label>
+              <select id="deploy-region" class="form-select bg-surface text-white border-secondary">
+                <option value="ap-south-1">ap-south-1 (Mumbai, India)</option>
+                <option value="ap-southeast-1">ap-southeast-1 (Singapore)</option>
+                <option value="eu-central-1">eu-central-1 (Frankfurt)</option>
+                <option value="us-east-1">us-east-1 (N. Virginia)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-cyan w-100 fw-bold py-2 mt-2">Initialize Deployment Pipeline →</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Bootstrap 5.3 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
